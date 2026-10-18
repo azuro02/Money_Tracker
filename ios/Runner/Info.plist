@@ -66,5 +66,22 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>de</string>
+		<string>en</string>
+	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID is used to unlock Money Tracker.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera is used to attach photos of receipts to transactions.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photos can be attached to transactions as receipts.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
