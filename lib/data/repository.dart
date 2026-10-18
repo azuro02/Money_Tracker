@@ -55,10 +55,14 @@ class TransactionFilter {
     this.maxMoney,
     this.direction,
     this.limit,
+    this.allWallets = false,
   });
 
   /// Wallet UUID; null means "all wallets counted in the total".
   final String? wallet;
+
+  /// With [wallet] null: include wallets not counted in the total, too.
+  final bool allWallets;
 
   /// Category UUID; sub categories are included.
   final String? category;
@@ -173,7 +177,7 @@ class Repository {
       final list = jsonDecode(currenciesJson) as List;
       for (final item in list) {
         final m = item as Map<String, dynamic>;
-        db.raw.execute(
+        db.execute(
           'INSERT OR IGNORE INTO currencies (iso, name, symbol, decimals, '
           'favourite, last_edit) VALUES (?, ?, ?, ?, 0, ?)',
           [m['code'], m['name'], m['symbol'], m['decimals'] ?? 2, nowMillis()],
@@ -186,7 +190,7 @@ class Repository {
   void seedSystemCategories(Map<String, String> names) {
     for (final tag in SystemTag.all) {
       final name = names[tag] ?? SystemTag.defaultNames[tag]!;
-      db.raw.execute(
+      db.execute(
         'INSERT OR IGNORE INTO categories (uuid, name, icon, type, parent, '
         'tag, show_report, "index", last_edit) VALUES (?, ?, ?, ?, NULL, ?, '
         '1, 0, ?)',
@@ -234,9 +238,21 @@ class Repository {
       .map(Currency.fromRow)
       .toList();
 
+  Map<String, Currency>? _currencyCache;
+  int _currencyCacheRevision = -1;
+
+  /// Cached lookup (currencies are needed for every formatted amount).
   Currency? currency(String iso) {
-    final row = db.selectFirst('SELECT * FROM currencies WHERE iso = ?', [iso]);
-    return row == null ? null : Currency.fromRow(row);
+    if (db.inTransaction) {
+      final row =
+          db.selectFirst('SELECT * FROM currencies WHERE iso = ?', [iso]);
+      return row == null ? null : Currency.fromRow(row);
+    }
+    if (_currencyCache == null || _currencyCacheRevision != db.revision) {
+      _currencyCache = {for (final c in currencies()) c.iso: c};
+      _currencyCacheRevision = db.revision;
+    }
+    return _currencyCache![iso];
   }
 
   void saveCurrency(Currency c) {
@@ -562,7 +578,7 @@ class Repository {
   // ------------------------------------------------------------ transactions
 
   static const _transactionSelect = '''
-SELECT t.*, c.name AS c_name, c.icon AS c_icon, c.tag AS c_tag,
+SELECT t.*, c.name AS c_name, c.icon AS c_icon, c.tag AS c_tag, c.type AS c_type,
   c.parent AS c_parent, w.name AS w_name, w.currency AS w_currency,
   e.name AS e_name, p.name AS p_name,
   (SELECT tr.uuid FROM transfers tr WHERE tr."from" = t.uuid
@@ -579,6 +595,7 @@ LEFT JOIN places p ON p.uuid = t.place
         categoryName: r['c_name'] as String,
         categoryIcon: AppIcon.parse(r['c_icon'] as String?),
         categoryTag: r['c_tag'] as String?,
+        categoryType: (r['c_type'] as num).toInt(),
         categoryParent: r['c_parent'] as String?,
         walletName: r['w_name'] as String,
         currency: r['w_currency'] as String,
@@ -593,7 +610,7 @@ LEFT JOIN places p ON p.uuid = t.place
     if (f.wallet != null) {
       where.add('t.wallet = ?');
       args.add(f.wallet);
-    } else {
+    } else if (!f.allWallets) {
       where.add('w.count_in_total = 1');
     }
     if (f.category != null) {

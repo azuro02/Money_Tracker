@@ -24,6 +24,8 @@ class AppDatabase extends ChangeNotifier {
   /// Incremented on every committed change; handy for caching.
   int revision = 0;
 
+  bool get inTransaction => _txDepth > 0;
+
   void _migrate() {
     final version = raw.userVersion;
     if (version == 0) {
@@ -133,7 +135,7 @@ class AppDatabase extends ChangeNotifier {
     notifyListeners();
   }
 
-  void close() => raw.dispose();
+  void close() => raw.close();
 
   static Object? _toSql(Object? v) => v is bool ? (v ? 1 : 0) : v;
 }

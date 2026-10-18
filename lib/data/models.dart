@@ -487,6 +487,7 @@ class TransactionView {
     required this.categoryName,
     required this.categoryIcon,
     required this.categoryTag,
+    required this.categoryType,
     required this.categoryParent,
     required this.walletName,
     required this.currency,
@@ -499,6 +500,7 @@ class TransactionView {
   final String categoryName;
   final AppIcon categoryIcon;
   final String? categoryTag;
+  final int categoryType;
   final String? categoryParent;
   final String walletName;
   final String currency;
