@@ -59,7 +59,7 @@ class Settings extends ChangeNotifier {
   ThemeMode get themeMode => ThemeMode.values[_get('theme_mode', 0).clamp(0, 2)];
   set themeMode(ThemeMode v) => _set('theme_mode', v.index);
 
-  Color get seedColor => Color(_get('seed_color', 0xFF00897B));
+  Color get seedColor => Color(_get('seed_color', 0xFF0277BD));
   set seedColor(Color v) => _set('seed_color', v.toARGB32());
 
   Color get incomeColor => Color(_get('income_color', 0xFF2E7D32));

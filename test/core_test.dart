@@ -93,6 +93,10 @@ void main() {
           const ColorIcon('#FF0000', 'AB'));
       expect(AppIcon.parse('{"type":"resource","resource":"ic_icon_car"}'),
           const ResourceIcon('ic_icon_car'));
+      expect(
+          AppIcon.parse(
+              '{"type":"resource","resource":"mt_car","color":"#2196F3"}'),
+          const ResourceIcon('mt_car', color: '#2196F3'));
       expect(AppIcon.parse('garbage'), AppIcon.fallback);
       expect(AppIcon.parse(null), AppIcon.fallback);
     });
@@ -101,6 +105,11 @@ void main() {
       const icon = ColorIcon('#00FF00', 'Z');
       expect(AppIcon.parse(icon.toJson()), icon);
       expect(const ColorIcon('#123456', 'X').argb, 0xFF123456);
+      const colored = ResourceIcon('mt_car', color: '#2196F3');
+      expect(AppIcon.parse(colored.toJson()), colored);
+      expect(colored.argb, 0xFF2196F3);
+      expect(const ResourceIcon('ic_icon_car').toJson(),
+          '{"type":"resource","resource":"ic_icon_car"}');
     });
 
     test('initials', () {

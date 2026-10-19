@@ -17,10 +17,7 @@ class IconAvatar extends StatelessWidget {
     switch (icon) {
       case ColorIcon(:final argb, :final name):
         final color = Color(argb);
-        final onColor =
-            ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-                ? Colors.white
-                : Colors.black87;
+        final onColor = _onColor(color);
         return _circle(
           color,
           Text(
@@ -33,8 +30,13 @@ class IconAvatar extends StatelessWidget {
             ),
           ),
         );
-      case ResourceIcon(:final resource):
+      case ResourceIcon(:final resource, :final argb):
         final data = iconForResource(resource);
+        if (argb != null) {
+          final color = Color(argb);
+          return _circle(color,
+              Icon(data ?? Icons.category, size: size * .55, color: _onColor(color)));
+        }
         if (data == null) {
           return _circle(scheme.tertiaryContainer,
               Icon(Icons.category, size: size * .55, color: scheme.onTertiaryContainer));
@@ -43,6 +45,11 @@ class IconAvatar extends StatelessWidget {
             Icon(data, size: size * .55, color: scheme.onSecondaryContainer));
     }
   }
+
+  static Color _onColor(Color color) =>
+      ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+          ? Colors.white
+          : Colors.black87;
 
   Widget _circle(Color color, Widget child) => Container(
         width: size,

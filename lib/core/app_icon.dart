@@ -26,7 +26,10 @@ sealed class AppIcon {
             }
           case 'resource':
             final resource = map['resource'];
-            if (resource is String) return ResourceIcon(resource);
+            final color = map['color'];
+            if (resource is String) {
+              return ResourceIcon(resource, color: color is String ? color : null);
+            }
         }
       }
     } on FormatException {
@@ -47,11 +50,7 @@ class ColorIcon extends AppIcon {
   /// Short text (initials) painted on top of the color.
   final String name;
 
-  int get argb {
-    var hex = color.replaceFirst('#', '');
-    if (hex.length == 6) hex = 'FF$hex';
-    return int.tryParse(hex, radix: 16) ?? 0xFFFFC107;
-  }
+  int get argb => _parseArgb(color) ?? 0xFFFFC107;
 
   @override
   String toJson() => jsonEncode({'type': 'color', 'color': color, 'name': name});
@@ -65,19 +64,34 @@ class ColorIcon extends AppIcon {
 }
 
 class ResourceIcon extends AppIcon {
-  const ResourceIcon(this.resource);
+  const ResourceIcon(this.resource, {this.color});
 
   final String resource;
 
+  /// Optional background color in `#RRGGBB` notation; `null` uses the theme.
+  final String? color;
+
+  int? get argb => color == null ? null : _parseArgb(color!);
+
   @override
-  String toJson() => jsonEncode({'type': 'resource', 'resource': resource});
+  String toJson() => jsonEncode({
+        'type': 'resource',
+        'resource': resource,
+        if (color != null) 'color': color,
+      });
 
   @override
   bool operator ==(Object other) =>
-      other is ResourceIcon && other.resource == resource;
+      other is ResourceIcon && other.resource == resource && other.color == color;
 
   @override
-  int get hashCode => resource.hashCode;
+  int get hashCode => Object.hash(resource, color);
+}
+
+int? _parseArgb(String color) {
+  var hex = color.replaceFirst('#', '');
+  if (hex.length == 6) hex = 'FF$hex';
+  return int.tryParse(hex, radix: 16);
 }
 
 /// Material palette used for generated color icons (same idea as the

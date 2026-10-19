@@ -290,6 +290,10 @@ class _IconPickerState extends State<_IconPicker> {
     ColorIcon(:final color) => color,
     _ => materialIconColors[widget.name.length % materialIconColors.length],
   };
+  late String? _symbolColor = switch (widget.current) {
+    ResourceIcon(:final color) => color,
+    _ => null,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -315,22 +319,10 @@ class _IconPickerState extends State<_IconPicker> {
                       alignment: WrapAlignment.center,
                       children: [
                         for (final c in materialIconColors)
-                          InkWell(
-                            customBorder: const CircleBorder(),
+                          _ColorSwatch(
+                            color: Color(ColorIcon(c, '').argb),
+                            selected: c == _color,
                             onTap: () => setState(() => _color = c),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: Color(ColorIcon(c, '').argb),
-                                shape: BoxShape.circle,
-                                border: c == _color
-                                    ? Border.all(
-                                        width: 3,
-                                        color: Theme.of(context).colorScheme.onSurface)
-                                    : null,
-                              ),
-                            ),
                           ),
                       ],
                     ),
@@ -346,6 +338,28 @@ class _IconPickerState extends State<_IconPicker> {
                   primary: false,
                   padding: const EdgeInsets.all(12),
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _ColorSwatch(
+                            color: Theme.of(context).colorScheme.secondaryContainer,
+                            selected: _symbolColor == null,
+                            size: 36,
+                            onTap: () => setState(() => _symbolColor = null),
+                          ),
+                          for (final c in materialIconColors)
+                            _ColorSwatch(
+                              color: Color(ColorIcon(c, '').argb),
+                              selected: c == _symbolColor,
+                              size: 36,
+                              onTap: () => setState(() => _symbolColor = c),
+                            ),
+                        ],
+                      ),
+                    ),
                     for (final group in iconGroups.values)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
@@ -356,9 +370,11 @@ class _IconPickerState extends State<_IconPicker> {
                             for (final entry in group.entries)
                               InkWell(
                                 customBorder: const CircleBorder(),
-                                onTap: () => Navigator.pop(
-                                    context, ResourceIcon(entry.key)),
-                                child: IconAvatar(ResourceIcon(entry.key), size: 48),
+                                onTap: () => Navigator.pop(context,
+                                    ResourceIcon(entry.key, color: _symbolColor)),
+                                child: IconAvatar(
+                                    ResourceIcon(entry.key, color: _symbolColor),
+                                    size: 48),
                               ),
                           ],
                         ),
@@ -369,6 +385,40 @@ class _IconPickerState extends State<_IconPicker> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ColorSwatch extends StatelessWidget {
+  const _ColorSwatch({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+    this.size = 44,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      customBorder: const CircleBorder(),
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: selected
+              ? Border.all(width: 3, color: scheme.onSurface)
+              : Border.all(color: scheme.outlineVariant),
+        ),
       ),
     );
   }
