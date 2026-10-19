@@ -283,7 +283,7 @@
   "version": "Version {version}",
   "@version": {"placeholders": {"version": {"type": "String"}}},
   "licenseInfo": "Free software under the GNU General Public License v3.",
-  "credits": "Based on the ideas and the data format of MoneyWallet by Andrea Alessandrini (GPL v3). Not affiliated with the original project.",
+  "aboutCredits": "Based on the ideas and the data format of MoneyWallet by Andrea Alessandrini (GPL v3). Not affiliated with the original project.",
   "openSourceLicenses": "Open source licences",
 
   "currencies": "Currencies",

@@ -326,8 +326,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get credit => 'Forderung';
 
   @override
-  String get credits =>
-      'Basiert auf den Ideen und dem Datenformat von MoneyWallet von Andrea Alessandrini (GPL v3). Kein offizielles Projekt des Originals.';
+  String get credits => 'Forderungen';
 
   @override
   String get newDebt => 'Neue Schuld';
@@ -844,6 +843,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get licenseInfo =>
       'Freie Software unter der GNU General Public License v3.';
+
+  @override
+  String get aboutCredits =>
+      'Basiert auf den Ideen und dem Datenformat von MoneyWallet von Andrea Alessandrini (GPL v3). Kein offizielles Projekt des Originals.';
 
   @override
   String get openSourceLicenses => 'Open-Source-Lizenzen';

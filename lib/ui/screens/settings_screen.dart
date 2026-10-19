@@ -531,7 +531,7 @@ class AboutScreen extends StatelessWidget {
           ),
           InfoCard(
             title: 'GPL v3',
-            child: Text('${l.licenseInfo}\n\n${l.credits}'),
+            child: Text('${l.licenseInfo}\n\n${l.aboutCredits}'),
           ),
           const SizedBox(height: 8),
           OutlinedButton(

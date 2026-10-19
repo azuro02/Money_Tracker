@@ -25,6 +25,7 @@ const _fallbackPalette = <Color>[
 Color _categoryColor(Category? c, int index) {
   final icon = c?.icon;
   if (icon is ColorIcon) return Color(icon.argb);
+  if (icon is ResourceIcon && icon.argb != null) return Color(icon.argb!);
   return _fallbackPalette[index % _fallbackPalette.length];
 }
 

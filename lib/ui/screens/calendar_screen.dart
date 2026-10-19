@@ -21,9 +21,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _selected = dateOnly(DateTime.now());
 
   void _shift(int months) => setState(() {
-        _month = DateTime(_month.year, _month.month + months);
-        _selected = _month;
-      });
+    _month = DateTime(_month.year, _month.month + months);
+    _selected = _month;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final wallet = settings.currentWallet;
     final monthRange = Period(_month, DateTime(_month.year, _month.month + 1));
     final transactions = repo.transactions(
-        TransactionFilter(wallet: wallet, start: monthRange.start, end: monthRange.end));
+      TransactionFilter(
+        wallet: wallet,
+        start: monthRange.start,
+        end: monthRange.end,
+      ),
+    );
     // Expense / income per day (all currencies summed per currency).
     final expense = <DateTime, int>{};
     final income = <DateTime, int>{};
@@ -59,48 +64,60 @@ class _CalendarScreenState extends State<CalendarScreen> {
         .toList();
     final currency = repo.currenciesFor(wallet).firstOrNull ?? 'EUR';
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l.calendar)),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              IconButton(onPressed: () => _shift(-1), icon: const Icon(Icons.chevron_left)),
-              Expanded(
-                child: Text(context.formatMonth(_month),
-                    textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+    final calendar = Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: () => _shift(-1),
+              icon: const Icon(Icons.chevron_left),
+            ),
+            Expanded(
+              child: Text(
+                context.formatMonth(_month),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium,
               ),
-              IconButton(onPressed: () => _shift(1), icon: const Icon(Icons.chevron_right)),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                for (var i = 0; i < 7; i++)
-                  Expanded(
-                    child: Center(
-                      child: Text(names[(firstDay + i) % 7],
-                          style: theme.textTheme.labelSmall),
+            ),
+            IconButton(
+              onPressed: () => _shift(1),
+              icon: const Icon(Icons.chevron_right),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              for (var i = 0; i < 7; i++)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      names[(firstDay + i) % 7],
+                      style: theme.textTheme.labelSmall,
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: GridView.count(
-              crossAxisCount: 7,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: .9,
-              children: [
-                for (var i = 0; i < leading; i++) const SizedBox(),
-                for (var day = 1; day <= days; day++)
-                  Builder(builder: (context) {
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: GridView.count(
+            crossAxisCount: 7,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: .9,
+            children: [
+              for (var i = 0; i < leading; i++) const SizedBox(),
+              for (var day = 1; day <= days; day++)
+                Builder(
+                  builder: (context) {
                     final date = DateTime(_month.year, _month.month, day);
                     final spent = expense[date] ?? 0;
-                    final intensity = maxExpense == 0 ? 0.0 : spent / maxExpense;
+                    final intensity = maxExpense == 0
+                        ? 0.0
+                        : spent / maxExpense;
                     final selected = date == _selected;
                     final today = date == dateOnly(DateTime.now());
                     return Padding(
@@ -108,15 +125,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       child: Material(
                         color: spent == 0
                             ? Colors.transparent
-                            : Color.lerp(settings.expenseColor.withValues(alpha: .08),
-                                settings.expenseColor.withValues(alpha: .55), intensity),
+                            : Color.lerp(
+                                settings.expenseColor.withValues(alpha: .08),
+                                settings.expenseColor.withValues(alpha: .55),
+                                intensity,
+                              ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                           side: selected
-                              ? BorderSide(color: theme.colorScheme.primary, width: 2)
+                              ? BorderSide(
+                                  color: theme.colorScheme.primary,
+                                  width: 2,
+                                )
                               : today
-                                  ? BorderSide(color: theme.colorScheme.outline)
-                                  : BorderSide.none,
+                              ? BorderSide(color: theme.colorScheme.outline)
+                              : BorderSide.none,
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
@@ -131,38 +154,75 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   height: 5,
                                   margin: const EdgeInsets.only(top: 2),
                                   decoration: BoxDecoration(
-                                      color: settings.incomeColor,
-                                      shape: BoxShape.circle),
+                                    color: settings.incomeColor,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                             ],
                           ),
                         ),
                       ),
                     );
-                  }),
+                  },
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+    final dayList = Column(
+      children: [
+        ListTile(
+          title: Text(
+            context.formatDate(_selected),
+            style: theme.textTheme.titleSmall,
+          ),
+          trailing: (expense[_selected] ?? 0) == 0
+              ? null
+              : MoneyText(-(expense[_selected] ?? 0), currency),
+        ),
+        Expanded(
+          child: dayTransactions.isEmpty
+              ? EmptyState(icon: Icons.event_available, title: l.emptyList)
+              : ListView(
+                  children: [
+                    for (final v in dayTransactions)
+                      TransactionTile(v, showWallet: wallet == null),
+                  ],
+                ),
+        ),
+      ],
+    );
+
+    // Wide screens: calendar and day list side by side; otherwise stacked
+    // with the calendar limited in width so the square cells fit.
+    final wide = MediaQuery.sizeOf(context).width >= 840;
+    return Scaffold(
+      appBar: AppBar(title: Text(l.calendar)),
+      body: wide
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 480,
+                  child: SingleChildScrollView(child: calendar),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: dayList),
+              ],
+            )
+          : Column(
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: calendar,
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(child: dayList),
               ],
             ),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            title: Text(context.formatDate(_selected),
-                style: theme.textTheme.titleSmall),
-            trailing: (expense[_selected] ?? 0) == 0
-                ? null
-                : MoneyText(-(expense[_selected] ?? 0), currency),
-          ),
-          Expanded(
-            child: dayTransactions.isEmpty
-                ? EmptyState(icon: Icons.event_available, title: l.emptyList)
-                : ListView(
-                    children: [
-                      for (final v in dayTransactions)
-                        TransactionTile(v, showWallet: wallet == null),
-                    ],
-                  ),
-          ),
-        ],
-      ),
     );
   }
 }

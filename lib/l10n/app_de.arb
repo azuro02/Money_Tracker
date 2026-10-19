@@ -266,7 +266,7 @@
   "privacyText": "Money Tracker funktioniert komplett offline. Die App hat keine Internet-Berechtigung, enthält weder Tracking noch Werbung und erhebt keinerlei Daten. Deine Daten verlassen das Gerät nur, wenn du selbst eine Sicherung oder einen Export teilst.",
   "version": "Version {version}",
   "licenseInfo": "Freie Software unter der GNU General Public License v3.",
-  "credits": "Basiert auf den Ideen und dem Datenformat von MoneyWallet von Andrea Alessandrini (GPL v3). Kein offizielles Projekt des Originals.",
+  "aboutCredits": "Basiert auf den Ideen und dem Datenformat von MoneyWallet von Andrea Alessandrini (GPL v3). Kein offizielles Projekt des Originals.",
   "openSourceLicenses": "Open-Source-Lizenzen",
 
   "currencies": "Währungen",

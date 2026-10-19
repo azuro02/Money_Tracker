@@ -44,3 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /tool/interop/lib/
+
+# Release signing (never commit)
+/android/key.properties
+*.jks
+*.keystore

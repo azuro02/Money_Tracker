@@ -78,6 +78,9 @@ flutter build apk        # Android
 flutter build ipa        # iOS (requires macOS with Xcode)
 ```
 
+Store release (signing, icons, screenshots, listing texts): see
+[store/README.md](store/README.md).
+
 Project layout:
 
 - `lib/core`: money, dates, icons, calculator

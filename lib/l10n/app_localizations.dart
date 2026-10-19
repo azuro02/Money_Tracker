@@ -725,7 +725,7 @@ abstract class AppLocalizations {
   /// No description provided for @credits.
   ///
   /// In en, this message translates to:
-  /// **'Based on the ideas and the data format of MoneyWallet by Andrea Alessandrini (GPL v3). Not affiliated with the original project.'**
+  /// **'Credits'**
   String get credits;
 
   /// No description provided for @newDebt.
@@ -1603,6 +1603,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free software under the GNU General Public License v3.'**
   String get licenseInfo;
+
+  /// No description provided for @aboutCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on the ideas and the data format of MoneyWallet by Andrea Alessandrini (GPL v3). Not affiliated with the original project.'**
+  String get aboutCredits;
 
   /// No description provided for @openSourceLicenses.
   ///

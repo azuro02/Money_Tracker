@@ -1,4 +1,4 @@
-package org.moneytracker.money_tracker
+package de.moneytracker.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
